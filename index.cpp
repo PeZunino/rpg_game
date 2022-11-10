@@ -22,12 +22,6 @@ struct Inimigo
   int vida;
   Arma arma;
 };
-struct Fase
-{
-  string nome;
-  Inimigo contagem_inimigos[5];
-  Inimigo *inimigos;
-};
 //*FIM struct pre-existente
 
 //*INICIO struct novas
@@ -37,11 +31,17 @@ struct Bloco
   bool pacifico;
   Inimigo *inimigo;
 };
-
 struct Mapa
 {
   int altura, largura;
   Bloco **mapa;
+};
+struct Fase
+{
+  string nome;
+  Mapa mapa;
+  int contagem_inimigos = 5;
+  Inimigo inimigos[5];
 };
 //*FIM struct novas
 
@@ -130,7 +130,6 @@ Mapa CriarMapa(int altura, int largura)
   int contagem_pacificos = 0;
 
   pntr_mapa->mapa = new Bloco *[altura];
-
   for (int linha = 0; linha < altura; linha++)
   {
     pntr_mapa->mapa[linha] = new Bloco[largura];
@@ -176,32 +175,29 @@ bool SorteioDe20Porcento()
   }
 }
 
-Bloco *SortearBlocoParaInimigo(Mapa *pntr_mapa)
-{
-  Bloco *pntr_bloco;
-
-  do
-  {
-
-    int altura_sorteada = rand() % pntr_mapa->altura;
-    int largura_sorteada = rand() % pntr_mapa->largura;
-
-    Bloco bloco_sorteado = pntr_mapa->mapa.bloco[altura_sorteada][largura_sorteada];
-
-    pntr_bloco = &bloco_sorteado;
-
-  } while (!bloco_sorteado.bloqueado && bloco_sorteado.pacifico);
-
-  return bloco_sorteado;
-}
-
-Fase CriarFase(int numInimigos, Inimigos *inimigos, int alturaMapa, int larguraMapa)
+void CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMapa)
 {
   Mapa mapa = CriarMapa(alturaMapa, larguraMapa);
 
+  Mapa *pntr_mapa = &mapa;
+
+  Bloco *bloco_sorteado = new Bloco;
+
+  int altura_sorteada;
+  int largura_sorteada;
   for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
   {
-    SortearBlocoParaInimigo();
+    do
+    {
+
+      altura_sorteada = rand() % pntr_mapa->altura;
+      largura_sorteada = rand() % pntr_mapa->largura;
+
+      bloco_sorteado = &pntr_mapa->mapa[altura_sorteada][largura_sorteada];
+
+    } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
+
+    bloco_sorteado->inimigo = &inimigos[index_inimigo];
   }
 }
 
@@ -226,7 +222,9 @@ int main()
 
   Jogador jogador = criar_jogador();
 
-  fase = CriarFase(sizeof(fase.contagem_inimigos), fase.inimigos, 10, 10);
+  Inimigo *pntr_inimigos = fase.inimigos;
+
+  CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
 
   //*jogar_fase(jogador, fase);
 }
