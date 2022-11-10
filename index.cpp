@@ -120,6 +120,26 @@ bool SorteioDe20Porcento();
 
 void ExibirMapa(Mapa mapa);
 
+Bloco *EncontrarBlocoLivre(Mapa *pntr_mapa)
+{
+  Bloco *bloco_sorteado;
+
+  int altura_sorteada;
+  int largura_sorteada;
+
+  do
+  {
+
+    altura_sorteada = rand() % pntr_mapa->altura;
+    largura_sorteada = rand() % pntr_mapa->largura;
+
+    bloco_sorteado = &pntr_mapa->mapa[altura_sorteada][largura_sorteada];
+
+  } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
+
+  return bloco_sorteado;
+}
+
 Mapa CriarMapa(int altura, int largura)
 {
   Mapa mapa;
@@ -185,10 +205,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
   Mapa *pntr_mapa = &mapa;
 
-  Bloco *bloco_sorteado = new Bloco;
-
-  int altura_sorteada;
-  int largura_sorteada;
+  Bloco *bloco_sorteado;
 
   Arma aI = {1, 5};
 
@@ -208,15 +225,8 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
   for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
   {
-    do
-    {
 
-      altura_sorteada = rand() % pntr_mapa->altura;
-      largura_sorteada = rand() % pntr_mapa->largura;
-
-      bloco_sorteado = &pntr_mapa->mapa[altura_sorteada][largura_sorteada];
-
-    } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
+    bloco_sorteado = EncontrarBlocoLivre(pntr_mapa);
 
     bloco_sorteado->inimigo = &inimigos[index_inimigo];
   }
