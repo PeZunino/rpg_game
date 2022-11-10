@@ -243,8 +243,12 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
   return fase;
 }
 
-void Movimentar()
+void Movimentar(Jogador jogador)
 {
+  BlocoLivre bloco_livre = EncontrarBlocoLivre();
+
+  jogador.posicao[0] = bloco_livre.altura;
+  jogador.posicao[1] = bloco_livre.largura;
 }
 
 void ExibirMapa(Mapa mapa)
