@@ -45,6 +45,11 @@ struct Fase
   int contagem_inimigos = 5;
   Inimigo inimigos[5];
 };
+struct BlocoLivre
+{
+  Bloco *bloco;
+  int altura, linha;
+};
 //*FIM struct novas
 
 //*INICIO funcoes pre-existentes
@@ -95,8 +100,7 @@ void jogar_fase(Jogador jog, Fase fase)
       }
     }
 
-    cout << fase.inimigos[atual].nome << " foi morto" << endl
-         << endl;
+    cout << fase.inimigos[atual].nome << " foi morto" << endl;
   }
 
   cout << "O jogador passou a fase";
@@ -120,10 +124,11 @@ bool SorteioDe20Porcento();
 
 void ExibirMapa(Mapa mapa);
 
-Bloco *EncontrarBlocoLivre(Mapa *pntr_mapa)
+BlocoLivre EncontrarBlocoLivre(Mapa *pntr_mapa)
 {
   Bloco *bloco_sorteado;
 
+  BlocoLivre bloco_livre;
   int altura_sorteada;
   int largura_sorteada;
 
@@ -137,7 +142,9 @@ Bloco *EncontrarBlocoLivre(Mapa *pntr_mapa)
 
   } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
 
-  return bloco_sorteado;
+  bloco_livre = {bloco_sorteado, altura_sorteada, largura_sorteada};
+
+  return bloco_livre;
 }
 
 Mapa CriarMapa(int altura, int largura)
@@ -205,7 +212,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
   Mapa *pntr_mapa = &mapa;
 
-  Bloco *bloco_livre;
+  BlocoLivre bloco_livre;
 
   Arma aI = {1, 5};
 
@@ -228,7 +235,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
     bloco_livre = EncontrarBlocoLivre(pntr_mapa);
 
-    bloco_livre->inimigo = &inimigos[index_inimigo];
+    bloco_livre.bloco->inimigo = &inimigos[index_inimigo];
   }
 
   ExibirMapa(mapa);
