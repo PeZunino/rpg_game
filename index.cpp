@@ -205,7 +205,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
   Mapa *pntr_mapa = &mapa;
 
-  Bloco *bloco_sorteado;
+  Bloco *bloco_livre;
 
   Arma aI = {1, 5};
 
@@ -226,9 +226,9 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
   for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
   {
 
-    bloco_sorteado = EncontrarBlocoLivre(pntr_mapa);
+    bloco_livre = EncontrarBlocoLivre(pntr_mapa);
 
-    bloco_sorteado->inimigo = &inimigos[index_inimigo];
+    bloco_livre->inimigo = &inimigos[index_inimigo];
   }
 
   ExibirMapa(mapa);
