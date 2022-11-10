@@ -118,6 +118,8 @@ Jogador criar_jogador()
 //*INICIO funcoes novas
 bool SorteioDe20Porcento();
 
+void ExibirMapa(Mapa mapa);
+
 Mapa CriarMapa(int altura, int largura)
 {
   Mapa mapa;
@@ -219,7 +221,39 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
     bloco_sorteado->inimigo = &inimigos[index_inimigo];
   }
 
+  ExibirMapa(mapa);
+
   return fase;
+}
+
+void Movimentar()
+{
+}
+
+void ExibirMapa(Mapa mapa)
+{
+  for (int linha = 0; linha < mapa.altura; linha++)
+  {
+    for (int coluna = 0; coluna < mapa.largura; coluna++)
+    {
+      Bloco bloco = mapa.mapa[linha][coluna];
+
+      if (bloco.bloqueado)
+      {
+        cout << "X";
+      }
+      else if (bloco.inimigo)
+      {
+        cout << "I";
+      }
+      else
+      {
+        cout << "_";
+      }
+    }
+
+    cout << "\n";
+  }
 }
 
 int main()
@@ -233,9 +267,9 @@ int main()
 
   fase = CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
 
-  char keyboard;
+  // char keyboard;
 
-  keyboard = getchar();
+  // keyboard = getchar();
 
   //*jogar_fase(jogador, fase);
 }
