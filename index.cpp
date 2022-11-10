@@ -160,7 +160,7 @@ Mapa CriarMapa(int altura, int largura)
       }
     }
   }
-  cout << "contagem pedra : " << contagem_pedras << " contagem pacificos: " << contagem_pacificos;
+  cout << "contagem pedra : " << contagem_pedras << " contagem pacificos: " << contagem_pacificos << endl;
 
   return mapa;
 }
