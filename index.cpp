@@ -25,7 +25,8 @@ struct Inimigo
 struct Fase
 {
   string nome;
-  Inimigo inimigos[5];
+  Inimigo contagem_inimigos[5];
+  Inimigo *inimigos;
 };
 //*FIM struct pre-existente
 
@@ -110,27 +111,6 @@ Jogador criar_jogador()
 
   return jog;
 }
-
-Fase atribuir_inimigos()
-{
-  Arma aI = {1, 5};
-
-  Inimigo goblin1 = {"Goblin", 20, aI};
-  Inimigo goblin2 = {"Goblerto", 30, aI};
-  Inimigo goblin3 = {"Gobo", 40, aI};
-  Inimigo goblin4 = {"Goblinio", 50, aI};
-  Inimigo chefao = {"Juca", 95, aI};
-
-  Fase fase;
-  fase.nome = "Fase 1";
-  fase.inimigos[0] = goblin1;
-  fase.inimigos[1] = goblin2;
-  fase.inimigos[2] = goblin3;
-  fase.inimigos[3] = goblin4;
-  fase.inimigos[4] = chefao;
-
-  return fase;
-}
 //*FIM funcoes pre-existentes
 
 //*INICIO funcoes novas
@@ -151,10 +131,10 @@ Mapa CriarMapa(int altura, int largura)
 
   pntr_mapa->mapa = new Bloco *[altura];
 
-  for (int linha = 0; linha <= 9; linha++)
+  for (int linha = 0; linha < altura; linha++)
   {
     pntr_mapa->mapa[linha] = new Bloco[largura];
-    for (int coluna = 0; coluna <= 9; coluna++)
+    for (int coluna = 0; coluna < largura; coluna++)
     {
       if (SorteioDe20Porcento())
       {
@@ -178,6 +158,7 @@ Mapa CriarMapa(int altura, int largura)
     }
   }
   cout << "contagem pedra : " << contagem_pedras << " contagem pacificos: " << contagem_pacificos;
+
   return mapa;
 }
 
@@ -195,14 +176,57 @@ bool SorteioDe20Porcento()
   }
 }
 
+Bloco *SortearBlocoParaInimigo(Mapa *pntr_mapa)
+{
+  Bloco *pntr_bloco;
+
+  do
+  {
+
+    int altura_sorteada = rand() % pntr_mapa->altura;
+    int largura_sorteada = rand() % pntr_mapa->largura;
+
+    Bloco bloco_sorteado = pntr_mapa->mapa.bloco[altura_sorteada][largura_sorteada];
+
+    pntr_bloco = &bloco_sorteado;
+
+  } while (!bloco_sorteado.bloqueado && bloco_sorteado.pacifico);
+
+  return bloco_sorteado;
+}
+
+Fase CriarFase(int numInimigos, Inimigos *inimigos, int alturaMapa, int larguraMapa)
+{
+  Mapa mapa = CriarMapa(alturaMapa, larguraMapa);
+
+  for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
+  {
+    SortearBlocoParaInimigo();
+  }
+}
+
 int main()
 {
   srand(time(NULL));
+  Arma aI = {1, 5};
+
+  Inimigo goblin1 = {"Goblin", 20, aI};
+  Inimigo goblin2 = {"Goblerto", 30, aI};
+  Inimigo goblin3 = {"Gobo", 40, aI};
+  Inimigo goblin4 = {"Goblinio", 50, aI};
+  Inimigo chefao = {"Juca", 95, aI};
+
+  Fase fase;
+  fase.nome = "Fase 1";
+  fase.inimigos[0] = goblin1;
+  fase.inimigos[1] = goblin2;
+  fase.inimigos[2] = goblin3;
+  fase.inimigos[3] = goblin4;
+  fase.inimigos[4] = chefao;
 
   Jogador jogador = criar_jogador();
 
-  Fase fase = atribuir_inimigos();
+  fase = CriarFase(sizeof(fase.contagem_inimigos), fase.inimigos, 10, 10);
 
-  Mapa mapa = CriarMapa(10, 10);
   //*jogar_fase(jogador, fase);
 }
