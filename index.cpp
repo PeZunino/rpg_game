@@ -48,7 +48,7 @@ struct Fase
 struct BlocoLivre
 {
   Bloco *bloco;
-  int altura, linha;
+  int altura, largura;
 };
 //*FIM struct novas
 
@@ -114,7 +114,6 @@ Jogador criar_jogador()
   int *pntr_posicao_jogador = posicao_jogador;
 
   Jogador jog = {1, 100, aJ, pntr_posicao_jogador};
-
   return jog;
 }
 //*FIM funcoes pre-existentes
@@ -122,9 +121,9 @@ Jogador criar_jogador()
 //*INICIO funcoes novas
 bool SorteioDe20Porcento();
 
-void ExibirMapa(Mapa mapa);
+void ExibirMapa(Mapa mapa, Jogador jogador);
 
-BlocoLivre EncontrarBlocoLivre(Mapa *pntr_mapa)
+BlocoLivre EncontrarBlocoLivre(Mapa mapa)
 {
   Bloco *bloco_sorteado;
 
@@ -135,10 +134,10 @@ BlocoLivre EncontrarBlocoLivre(Mapa *pntr_mapa)
   do
   {
 
-    altura_sorteada = rand() % pntr_mapa->altura;
-    largura_sorteada = rand() % pntr_mapa->largura;
+    altura_sorteada = rand() % mapa.altura;
+    largura_sorteada = rand() % mapa.largura;
 
-    bloco_sorteado = &pntr_mapa->mapa[altura_sorteada][largura_sorteada];
+    bloco_sorteado = &mapa.mapa[altura_sorteada][largura_sorteada];
 
   } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
 
@@ -210,8 +209,6 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 {
   Mapa mapa = CriarMapa(alturaMapa, larguraMapa);
 
-  Mapa *pntr_mapa = &mapa;
-
   BlocoLivre bloco_livre;
 
   Arma aI = {1, 5};
@@ -233,32 +230,52 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
   for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
   {
 
-    bloco_livre = EncontrarBlocoLivre(pntr_mapa);
+    bloco_livre = EncontrarBlocoLivre(mapa);
 
     bloco_livre.bloco->inimigo = &inimigos[index_inimigo];
   }
 
-  ExibirMapa(mapa);
-
+  fase.mapa = mapa;
   return fase;
 }
 
-void Movimentar(Jogador jogador)
+void Movimentar(Jogador *jogador, Mapa mapa)
 {
-  BlocoLivre bloco_livre = EncontrarBlocoLivre();
+  char keyboard;
 
-  jogador.posicao[0] = bloco_livre.altura;
-  jogador.posicao[1] = bloco_livre.largura;
+  keyboard = getchar();
+
+  switch (keyboard)
+  {
+  case 'W':
+    jogador->posicao[0] = jogador->posicao[0] + 1;
+    break;
+  case 'S':
+    jogador->posicao[0] = jogador->posicao[0] - 1;
+    break;
+  case 'D':
+    jogador->posicao[1] = jogador->posicao[0] + 1;
+    break;
+  case 'a':
+    jogador->posicao[0] = jogador->posicao[0] + 1;
+    break;
+  }
 }
 
-void ExibirMapa(Mapa mapa)
+void ExibirMapa(Mapa mapa, Jogador jogador)
 {
+
   for (int linha = 0; linha < mapa.altura; linha++)
   {
     for (int coluna = 0; coluna < mapa.largura; coluna++)
     {
-      Bloco bloco = mapa.mapa[linha][coluna];
+      if (linha == jogador.posicao[0] && coluna == jogador.posicao[1])
+      {
+        cout << "O";
+        continue;
+      }
 
+      Bloco bloco = mapa.mapa[linha][coluna];
       if (bloco.bloqueado)
       {
         cout << "X";
@@ -277,20 +294,36 @@ void ExibirMapa(Mapa mapa)
   }
 }
 
+void PosicionarJogadorAleatorio(Fase fase, Jogador *jogador)
+{
+  BlocoLivre bloco_livre = EncontrarBlocoLivre(fase.mapa);
+
+  int nova_posicao[2] = {bloco_livre.altura, bloco_livre.largura};
+  jogador->posicao = nova_posicao;
+}
+
 int main()
 {
   srand(time(NULL));
 
   Jogador jogador = criar_jogador();
+  Jogador *pntr_jogador = &jogador;
 
   Fase fase;
   Inimigo *pntr_inimigos = fase.inimigos;
 
   fase = CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
 
-  // char keyboard;
+  PosicionarJogadorAleatorio(fase, pntr_jogador);
+  do
+  {
 
-  // keyboard = getchar();
+    ExibirMapa(fase.mapa, jogador);
+
+    Movimentar(pntr_jogador, fase.mapa);
+
+    system("clear");
+  } while (true);
 
   //*jogar_fase(jogador, fase);
 }
