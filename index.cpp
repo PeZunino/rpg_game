@@ -175,7 +175,7 @@ bool SorteioDe20Porcento()
   }
 }
 
-void CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMapa)
+Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMapa)
 {
   Mapa mapa = CriarMapa(alturaMapa, larguraMapa);
 
@@ -185,25 +185,7 @@ void CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
   int altura_sorteada;
   int largura_sorteada;
-  for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
-  {
-    do
-    {
 
-      altura_sorteada = rand() % pntr_mapa->altura;
-      largura_sorteada = rand() % pntr_mapa->largura;
-
-      bloco_sorteado = &pntr_mapa->mapa[altura_sorteada][largura_sorteada];
-
-    } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
-
-    bloco_sorteado->inimigo = &inimigos[index_inimigo];
-  }
-}
-
-int main()
-{
-  srand(time(NULL));
   Arma aI = {1, 5};
 
   Inimigo goblin1 = {"Goblin", 20, aI};
@@ -220,11 +202,38 @@ int main()
   fase.inimigos[3] = goblin4;
   fase.inimigos[4] = chefao;
 
+  for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
+  {
+    do
+    {
+
+      altura_sorteada = rand() % pntr_mapa->altura;
+      largura_sorteada = rand() % pntr_mapa->largura;
+
+      bloco_sorteado = &pntr_mapa->mapa[altura_sorteada][largura_sorteada];
+
+    } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
+
+    bloco_sorteado->inimigo = &inimigos[index_inimigo];
+  }
+
+  return fase;
+}
+
+int main()
+{
+  srand(time(NULL));
+
   Jogador jogador = criar_jogador();
 
+  Fase fase;
   Inimigo *pntr_inimigos = fase.inimigos;
 
-  CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
+  fase = CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
+
+  char keyboard;
+
+  keyboard = getchar();
 
   //*jogar_fase(jogador, fase);
 }
