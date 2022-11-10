@@ -3,32 +3,48 @@
 #include <time.h>
 using namespace std;
 
+//*INICIO struct pre-existente
 struct Arma
 {
   int dano_minimo;
   int dano_maximo;
 };
-
 struct Jogador
 {
   int nivel;
   int vida;
   Arma arma;
+  int *posicao;
 };
-
 struct Inimigo
 {
   string nome;
   int vida;
   Arma arma;
 };
-
 struct Fase
 {
   string nome;
   Inimigo inimigos[5];
 };
+//*FIM struct pre-existente
 
+//*INICIO struct novas
+struct Bloco
+{
+  bool bloqueado;
+  bool pacifico;
+  Inimigo *inimigo;
+};
+
+struct Mapa
+{
+  int altura, largura;
+  Bloco **mapa;
+};
+//*FIM struct novas
+
+//*INICIO funcoes pre-existentes
 template <typename T>
 bool morreu(T personagem)
 {
@@ -83,6 +99,18 @@ void jogar_fase(Jogador jog, Fase fase)
   cout << "O jogador passou a fase";
 }
 
+Jogador criar_jogador()
+{
+  Arma aJ = {4, 10};
+
+  int posicao_jogador[2] = {0, 0};
+  int *pntr_posicao_jogador = posicao_jogador;
+
+  Jogador jog = {1, 100, aJ, pntr_posicao_jogador};
+
+  return jog;
+}
+
 Fase atribuir_inimigos()
 {
   Arma aI = {1, 5};
@@ -103,15 +131,78 @@ Fase atribuir_inimigos()
 
   return fase;
 }
+//*FIM funcoes pre-existentes
+
+//*INICIO funcoes novas
+bool SorteioDe20Porcento();
+
+Mapa CriarMapa(int altura, int largura)
+{
+  Mapa mapa;
+  Mapa *pntr_mapa;
+
+  pntr_mapa = &mapa;
+
+  pntr_mapa->altura = altura;
+  pntr_mapa->largura = largura;
+
+  int contagem_pedras = 0;
+  int contagem_pacificos = 0;
+
+  pntr_mapa->mapa = new Bloco *[altura];
+
+  for (int linha = 0; linha <= 9; linha++)
+  {
+    pntr_mapa->mapa[linha] = new Bloco[largura];
+    for (int coluna = 0; coluna <= 9; coluna++)
+    {
+      if (SorteioDe20Porcento())
+      {
+        contagem_pedras += 1;
+        pntr_mapa->mapa[linha][coluna].bloqueado = true;
+      }
+      else
+      {
+        pntr_mapa->mapa[linha][coluna].bloqueado = false;
+      }
+
+      if (!SorteioDe20Porcento())
+      {
+        contagem_pacificos += 1;
+        pntr_mapa->mapa[linha][coluna].pacifico = true;
+      }
+      else
+      {
+        pntr_mapa->mapa[linha][coluna].pacifico = false;
+      }
+    }
+  }
+  cout << "contagem pedra : " << contagem_pedras << " contagem pacificos: " << contagem_pacificos;
+  return mapa;
+}
+
+bool SorteioDe20Porcento()
+{
+  const int numero_sorteado = rand() % 100;
+
+  if (numero_sorteado >= 0 && numero_sorteado <= 19)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 
 int main()
 {
   srand(time(NULL));
 
-  Arma aJ = {4, 10};
-  Jogador jog = {1, 100, aJ};
+  Jogador jogador = criar_jogador();
 
   Fase fase = atribuir_inimigos();
 
-  jogar_fase(jog, fase);
+  Mapa mapa = CriarMapa(10, 10);
+  //*jogar_fase(jogador, fase);
 }
