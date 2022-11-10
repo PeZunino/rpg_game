@@ -16,7 +16,7 @@ struct Jogador
   int nivel;
   int vida;
   Arma arma;
-  int *posicao;
+  int posicao[2];
 };
 struct Inimigo
 {
@@ -110,10 +110,10 @@ Jogador criar_jogador()
 {
   Arma aJ = {4, 10};
 
-  int posicao_jogador[2] = {0, 0};
-  int *pntr_posicao_jogador = posicao_jogador;
+  Jogador jog = {1, 100, aJ};
 
-  Jogador jog = {1, 100, aJ, pntr_posicao_jogador};
+  jog.posicao[0] = 0;
+  jog.posicao[1] = 0;
   return jog;
 }
 //*FIM funcoes pre-existentes
@@ -123,7 +123,7 @@ bool SorteioDe20Porcento();
 
 void ExibirMapa(Mapa mapa, Jogador jogador);
 
-BlocoLivre EncontrarBlocoLivre(Mapa mapa)
+BlocoLivre EncontrarBlocoLivre(Mapa mapa, bool pacifico)
 {
   Bloco *bloco_sorteado;
 
@@ -139,7 +139,7 @@ BlocoLivre EncontrarBlocoLivre(Mapa mapa)
 
     bloco_sorteado = &mapa.mapa[altura_sorteada][largura_sorteada];
 
-  } while (!bloco_sorteado->bloqueado && bloco_sorteado->pacifico && !bloco_sorteado->inimigo);
+  } while (bloco_sorteado->bloqueado || pacifico != bloco_sorteado->pacifico || bloco_sorteado->inimigo);
 
   bloco_livre = {bloco_sorteado, altura_sorteada, largura_sorteada};
 
@@ -160,29 +160,33 @@ Mapa CriarMapa(int altura, int largura)
   int contagem_pacificos = 0;
 
   pntr_mapa->mapa = new Bloco *[altura];
+
+  Bloco *bloco_da_vez;
   for (int linha = 0; linha < altura; linha++)
   {
     pntr_mapa->mapa[linha] = new Bloco[largura];
     for (int coluna = 0; coluna < largura; coluna++)
     {
+      bloco_da_vez = &pntr_mapa->mapa[linha][coluna];
+
       if (SorteioDe20Porcento())
       {
         contagem_pedras += 1;
-        pntr_mapa->mapa[linha][coluna].bloqueado = true;
+        bloco_da_vez->bloqueado = true;
       }
       else
       {
-        pntr_mapa->mapa[linha][coluna].bloqueado = false;
+        bloco_da_vez->bloqueado = false;
       }
 
       if (!SorteioDe20Porcento())
       {
         contagem_pacificos += 1;
-        pntr_mapa->mapa[linha][coluna].pacifico = true;
+        bloco_da_vez->pacifico = true;
       }
       else
       {
-        pntr_mapa->mapa[linha][coluna].pacifico = false;
+        bloco_da_vez->pacifico = false;
       }
     }
   }
@@ -230,8 +234,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
   for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
   {
 
-    bloco_livre = EncontrarBlocoLivre(mapa);
-
+    bloco_livre = EncontrarBlocoLivre(mapa, false);
     bloco_livre.bloco->inimigo = &inimigos[index_inimigo];
   }
 
@@ -241,23 +244,47 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 
 void Movimentar(Jogador *jogador, Mapa mapa)
 {
+
   char keyboard;
 
   keyboard = getchar();
-
   switch (keyboard)
   {
   case 'W':
-    jogador->posicao[0] = jogador->posicao[0] + 1;
+    if (jogador->posicao[0] - 1 >= 0)
+    {
+      if (!mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]].bloqueado && !mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]].inimigo)
+      {
+        jogador->posicao[0] = jogador->posicao[0] - 1;
+      }
+    }
     break;
   case 'S':
-    jogador->posicao[0] = jogador->posicao[0] - 1;
+    if (jogador->posicao[0] + 1 <= 10)
+    {
+      if (!mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]].bloqueado && !mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]].inimigo)
+      {
+        jogador->posicao[0] = jogador->posicao[0] + 1;
+      }
+    }
     break;
   case 'D':
-    jogador->posicao[1] = jogador->posicao[0] + 1;
+    if (jogador->posicao[1] + 1 <= 10)
+    {
+      if (!mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1].bloqueado && !mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1].inimigo)
+      {
+        jogador->posicao[1] = jogador->posicao[1] + 1;
+      }
+    }
     break;
-  case 'a':
-    jogador->posicao[0] = jogador->posicao[0] + 1;
+  case 'A':
+    if (jogador->posicao[1] - 1 >= 0)
+    {
+      if (!mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1].bloqueado && !mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1].inimigo)
+      {
+        jogador->posicao[1] = jogador->posicao[1] - 1;
+      }
+    }
     break;
   }
 }
@@ -269,24 +296,29 @@ void ExibirMapa(Mapa mapa, Jogador jogador)
   {
     for (int coluna = 0; coluna < mapa.largura; coluna++)
     {
+
+      Bloco bloco = mapa.mapa[linha][coluna];
+
       if (linha == jogador.posicao[0] && coluna == jogador.posicao[1])
       {
         cout << "O";
         continue;
       }
-
-      Bloco bloco = mapa.mapa[linha][coluna];
-      if (bloco.bloqueado)
-      {
-        cout << "X";
-      }
-      else if (bloco.inimigo)
-      {
-        cout << "I";
-      }
       else
       {
-        cout << "_";
+        if (bloco.inimigo)
+        {
+          cout << "I";
+        }
+        else if (bloco.bloqueado)
+        {
+          cout << "X";
+        }
+
+        else
+        {
+          cout << "_";
+        }
       }
     }
 
@@ -296,10 +328,10 @@ void ExibirMapa(Mapa mapa, Jogador jogador)
 
 void PosicionarJogadorAleatorio(Fase fase, Jogador *jogador)
 {
-  BlocoLivre bloco_livre = EncontrarBlocoLivre(fase.mapa);
-
-  int nova_posicao[2] = {bloco_livre.altura, bloco_livre.largura};
-  jogador->posicao = nova_posicao;
+  BlocoLivre bloco_livre = EncontrarBlocoLivre(fase.mapa, true);
+  bloco_livre.bloco->pacifico = false;
+  jogador->posicao[0] = bloco_livre.altura;
+  jogador->posicao[1] = bloco_livre.largura;
 }
 
 int main()
@@ -315,14 +347,23 @@ int main()
   fase = CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
 
   PosicionarJogadorAleatorio(fase, pntr_jogador);
+
+  char keyboard;
+
+  do
+  {
+    cout << "Aperte [I] para iniciar (mantenha o capslock ligado)";
+    keyboard = getchar();
+
+  } while (keyboard != 'I');
   do
   {
 
+    system("clear");
     ExibirMapa(fase.mapa, jogador);
 
     Movimentar(pntr_jogador, fase.mapa);
 
-    system("clear");
   } while (true);
 
   //*jogar_fase(jogador, fase);
