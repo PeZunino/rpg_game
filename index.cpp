@@ -80,9 +80,7 @@ Tdef ataque(Tata atacante, Tdef defensor)
 
 void jogar_fase(Jogador jog, Fase fase)
 {
-  cout << "Começou " << fase.nome << endl
-       << endl;
-
+  cout << "Começou " << fase.nome << endl;
   for (int atual = 0; atual < 5; atual++)
   {
     while (!morreu(fase.inimigos[atual]))
@@ -104,6 +102,27 @@ void jogar_fase(Jogador jog, Fase fase)
   }
 
   cout << "O jogador passou a fase";
+}
+
+void batalha(Jogador jog, Inimigo inimigo)
+{
+
+  while (!morreu(inimigo))
+  {
+    jog = ataque(inimigo, jog);
+    inimigo = ataque(jog, inimigo);
+
+    cout << "O jogador atacou " << inimigo.nome << " e ele ficou com " << inimigo.vida << " de vida" << endl;
+    cout << "O " << inimigo.nome << "atacou o jogador ao mesmo tempo e o deixou com " << jog.vida << " de vida" << endl;
+
+    if (morreu(jog))
+    {
+      cout << "O jogador morreu, o jogo acabou";
+      return;
+    }
+  }
+
+  cout << "O jogador passou a fase\n";
 }
 
 Jogador criar_jogador()
@@ -245,48 +264,65 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
 void Movimentar(Jogador *jogador, Mapa mapa)
 {
 
+  int novo_valor_posicao;
+  int index_posicao = 0;
+  Bloco bloco_nova_posicao;
   char keyboard;
 
-  keyboard = getchar();
-  switch (keyboard)
+  do
   {
-  case 'W':
-    if (jogador->posicao[0] - 1 >= 0)
+    cin >> keyboard;
+
+    switch (keyboard)
     {
-      if (!mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]].bloqueado && !mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]].inimigo)
-      {
-        jogador->posicao[0] = jogador->posicao[0] - 1;
-      }
+    case 'W':
+      index_posicao = 0;
+      novo_valor_posicao = jogador->posicao[0] - 1;
+      bloco_nova_posicao = mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]];
+      break;
+    case 'S':
+
+      index_posicao = 0;
+      novo_valor_posicao = jogador->posicao[0] + 1;
+      bloco_nova_posicao = mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]];
+
+      break;
+    case 'D':
+
+      index_posicao = 1;
+      novo_valor_posicao = jogador->posicao[1] + 1;
+      bloco_nova_posicao = mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1];
+
+      break;
+    case 'A':
+
+      index_posicao = 1;
+      novo_valor_posicao = jogador->posicao[1] - 1;
+      bloco_nova_posicao = mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1];
+
+      break;
+    default:
+      break;
     }
-    break;
-  case 'S':
-    if (jogador->posicao[0] + 1 <= 10)
+
+    if (novo_valor_posicao < 0 || novo_valor_posicao > 10 || bloco_nova_posicao.bloqueado)
     {
-      if (!mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]].bloqueado && !mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]].inimigo)
-      {
-        jogador->posicao[0] = jogador->posicao[0] + 1;
-      }
+      continue;
     }
-    break;
-  case 'D':
-    if (jogador->posicao[1] + 1 <= 10)
+    if (bloco_nova_posicao.inimigo)
     {
-      if (!mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1].bloqueado && !mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1].inimigo)
-      {
-        jogador->posicao[1] = jogador->posicao[1] + 1;
-      }
+      batalha(*jogador, *bloco_nova_posicao.inimigo);
+      char cont;
+      cout << "...qualquer tecla para continuar ";
+      cin >> cont;
     }
+
+    jogador->posicao[index_posicao] = novo_valor_posicao;
+
+    mapa.mapa[jogador->posicao[0]][jogador->posicao[1]].inimigo = NULL;
+
     break;
-  case 'A':
-    if (jogador->posicao[1] - 1 >= 0)
-    {
-      if (!mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1].bloqueado && !mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1].inimigo)
-      {
-        jogador->posicao[1] = jogador->posicao[1] - 1;
-      }
-    }
-    break;
-  }
+  } while (true);
 }
 
 void ExibirMapa(Mapa mapa, Jogador jogador)
@@ -334,6 +370,11 @@ void PosicionarJogadorAleatorio(Fase fase, Jogador *jogador)
   jogador->posicao[1] = bloco_livre.largura;
 }
 
+void ExistemInimigos()
+{
+  for ()
+}
+
 int main()
 {
   srand(time(NULL));
@@ -353,7 +394,7 @@ int main()
   do
   {
     cout << "Aperte [I] para iniciar (mantenha o capslock ligado)";
-    keyboard = getchar();
+    cin >> keyboard;
 
   } while (keyboard != 'I');
   do
