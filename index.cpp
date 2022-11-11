@@ -267,11 +267,9 @@ void Movimentar(Jogador *jogador, Mapa mapa, char keyboard)
   int novo_valor_posicao;
   int index_posicao = 0;
   Bloco bloco_nova_posicao;
-  char keyboard;
 
   do
   {
-    cin >> keyboard;
 
     switch (keyboard)
     {
@@ -419,7 +417,10 @@ int main()
 
     ExibirMapa(fase.mapa, jogador);
 
-    Movimentar(pntr_jogador, fase.mapa);
+    char keyboard;
+    cin >> keyboard;
+
+    Movimentar(pntr_jogador, fase.mapa, keyboard);
 
   } while (ExistemInimigos(fase.mapa) || morreu(jogador));
 
