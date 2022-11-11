@@ -250,7 +250,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
   fase.inimigos[3] = goblin4;
   fase.inimigos[4] = chefao;
 
-  for (int index_inimigo = 0; index_inimigo < numInimigos; index_inimigo++)
+  for (int index_inimigo = 0; index_inimigo <= numInimigos; index_inimigo++)
   {
 
     bloco_livre = EncontrarBlocoLivre(mapa, false);
@@ -268,59 +268,54 @@ void Movimentar(Jogador *jogador, Mapa mapa, char keyboard)
   int index_posicao = 0;
   Bloco bloco_nova_posicao;
 
-  do
+  switch (keyboard)
   {
+  case 'W':
+    index_posicao = 0;
+    novo_valor_posicao = jogador->posicao[0] - 1;
+    bloco_nova_posicao = mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]];
+    break;
+  case 'S':
 
-    switch (keyboard)
-    {
-    case 'W':
-      index_posicao = 0;
-      novo_valor_posicao = jogador->posicao[0] - 1;
-      bloco_nova_posicao = mapa.mapa[jogador->posicao[0] - 1][jogador->posicao[1]];
-      break;
-    case 'S':
-
-      index_posicao = 0;
-      novo_valor_posicao = jogador->posicao[0] + 1;
-      bloco_nova_posicao = mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]];
-
-      break;
-    case 'D':
-
-      index_posicao = 1;
-      novo_valor_posicao = jogador->posicao[1] + 1;
-      bloco_nova_posicao = mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1];
-
-      break;
-    case 'A':
-
-      index_posicao = 1;
-      novo_valor_posicao = jogador->posicao[1] - 1;
-      bloco_nova_posicao = mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1];
-
-      break;
-    default:
-      break;
-    }
-
-    if (novo_valor_posicao < 0 || novo_valor_posicao > 10 || bloco_nova_posicao.bloqueado)
-    {
-      continue;
-    }
-    if (bloco_nova_posicao.inimigo)
-    {
-      batalha(*jogador, *bloco_nova_posicao.inimigo);
-      char cont;
-      cout << "...qualquer tecla para continuar ( vida jogador: " << jogador->vida << " )" << endl;
-      cin >> cont;
-    }
-
-    jogador->posicao[index_posicao] = novo_valor_posicao;
-
-    mapa.mapa[jogador->posicao[0]][jogador->posicao[1]].inimigo = NULL;
+    index_posicao = 0;
+    novo_valor_posicao = jogador->posicao[0] + 1;
+    bloco_nova_posicao = mapa.mapa[jogador->posicao[0] + 1][jogador->posicao[1]];
 
     break;
-  } while (true);
+  case 'D':
+
+    index_posicao = 1;
+    novo_valor_posicao = jogador->posicao[1] + 1;
+    bloco_nova_posicao = mapa.mapa[jogador->posicao[0]][jogador->posicao[1] + 1];
+
+    break;
+  case 'A':
+
+    index_posicao = 1;
+    novo_valor_posicao = jogador->posicao[1] - 1;
+    bloco_nova_posicao = mapa.mapa[jogador->posicao[0]][jogador->posicao[1] - 1];
+
+    break;
+  default:
+    break;
+  }
+
+  if (novo_valor_posicao < 0 || novo_valor_posicao > 10 || bloco_nova_posicao.bloqueado)
+  {
+    return;
+  }
+  if (bloco_nova_posicao.inimigo)
+  {
+    batalha(*jogador, *bloco_nova_posicao.inimigo);
+    char cont;
+    cout << "...qualquer tecla para continuar ( vida jogador: " << jogador->vida << " )" << endl;
+    cin >> cont;
+  }
+
+  jogador->posicao[index_posicao] = novo_valor_posicao;
+
+  mapa.mapa[jogador->posicao[0]][jogador->posicao[1]].inimigo = NULL;
+  return;
 }
 
 void ExibirMapa(Mapa mapa, Jogador jogador)
@@ -396,7 +391,7 @@ int main()
   Fase fase;
   Inimigo *pntr_inimigos = fase.inimigos;
 
-  fase = CriarFase(sizeof(fase.contagem_inimigos) + 1, pntr_inimigos, 10, 10);
+  fase = CriarFase(fase.contagem_inimigos, pntr_inimigos, 10, 10);
 
   PosicionarJogadorAleatorio(fase, pntr_jogador);
 
