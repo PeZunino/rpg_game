@@ -104,7 +104,7 @@ void jogar_fase(Jogador jog, Fase fase)
   cout << "O jogador passou a fase";
 }
 
-void batalha(Jogador jog, Inimigo inimigo)
+void batalha(Jogador &jog, Inimigo inimigo)
 {
 
   while (!morreu(inimigo))
@@ -261,7 +261,7 @@ Fase CriarFase(int numInimigos, Inimigo *inimigos, int alturaMapa, int larguraMa
   return fase;
 }
 
-void Movimentar(Jogador *jogador, Mapa mapa)
+void Movimentar(Jogador *jogador, Mapa mapa, char keyboard)
 {
 
   int novo_valor_posicao;
@@ -313,7 +313,7 @@ void Movimentar(Jogador *jogador, Mapa mapa)
     {
       batalha(*jogador, *bloco_nova_posicao.inimigo);
       char cont;
-      cout << "...qualquer tecla para continuar ";
+      cout << "...qualquer tecla para continuar ( vida jogador: " << jogador->vida << " )" << endl;
       cin >> cont;
     }
 
@@ -370,9 +370,22 @@ void PosicionarJogadorAleatorio(Fase fase, Jogador *jogador)
   jogador->posicao[1] = bloco_livre.largura;
 }
 
-void ExistemInimigos()
+bool ExistemInimigos(Mapa mapa)
 {
-  for ()
+  bool existe_inimigo = false;
+  for (int linha = 0; linha < mapa.altura; linha++)
+  {
+    for (int coluna = 0; coluna < mapa.largura; coluna++)
+    {
+
+      if (mapa.mapa[linha][coluna].inimigo)
+      {
+        existe_inimigo = true;
+        break;
+      }
+    }
+  }
+  return existe_inimigo;
 }
 
 int main()
@@ -397,15 +410,26 @@ int main()
     cin >> keyboard;
 
   } while (keyboard != 'I');
+
+  bool jogador_vivo;
   do
   {
 
     system("clear");
+
     ExibirMapa(fase.mapa, jogador);
 
     Movimentar(pntr_jogador, fase.mapa);
 
-  } while (true);
+  } while (ExistemInimigos(fase.mapa) || morreu(jogador));
 
+  if (morreu(jogador))
+  {
+    cout << "\n\t===MORTO===";
+  }
+  else
+  {
+    cout << "\n\t===PARABENS===";
+  }
   //*jogar_fase(jogador, fase);
 }
