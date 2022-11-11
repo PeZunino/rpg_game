@@ -381,7 +381,7 @@ bool ExistemInimigos(Mapa mapa)
   return existe_inimigo;
 }
 
-int main()
+void jogo()
 {
   srand(time(NULL));
 
@@ -427,5 +427,26 @@ int main()
   {
     cout << "\n\t===PARABENS===";
   }
+}
+
+template <typename Array, typename T>
+void breadFirstTravesal(Array array[6][2], T startAt)
+{
+
+  cout << startAt;
+  for (int neighbor : array[startAt])
+  {
+    if (neighbor == 0)
+    {
+      continue;
+    }
+    breadFirstTravesal(array, neighbor);
+  }
+}
+
+int main()
+{
+  int array[6][2] = {{1, 2}, {3}, {4}, {5}, {}, {}};
+  breadFirstTravesal(array, 0);
   //*jogar_fase(jogador, fase);
 }
