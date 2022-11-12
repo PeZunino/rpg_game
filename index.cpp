@@ -444,9 +444,62 @@ void breadFirstTravesal(Array array[6][2], T startAt)
   }
 }
 
+void analisarColuna(Bloco array[10], int startAt)
+{
+
+  cout << array[startAt];
+
+  for (int neighbor : array[startAt])
+  {
+    if ()
+    {
+      continue;
+    }
+    breadFirstTravesal(array, neighbor);
+  }
+}
+
+void mapaBreadFirstTravesal(Mapa mapa, int player_line, int player_column, int enemy_line, int enemy_column, )
+{
+  Bloco first_block;
+
+  Blocos *neighbors = new Bloco;
+
+  for (int line = enemy_line; line < mapa.altura; line++)
+  {
+    for (int column = enemy_column; column < mapa.largura; column++)
+    {
+
+      first_block = mapa.mapa[line][column];
+
+      for (int neighbors_count = 0; neighbors_count <= 4; neighbors_count++)
+      {
+        neighbors[neighbors_count] = mapa.mapa[left_one][]
+      }
+
+      cout << "[" << line << column << "] " << first_block.bloqueado << !!first_block.inimigo << " ";
+    }
+    cout << "\n";
+  }
+}
+
 int main()
 {
+  srand(time(NULL));
+
+  Jogador jogador = criar_jogador();
+  Jogador *pntr_jogador = &jogador;
+
+  Fase fase;
+  Inimigo *pntr_inimigos = fase.inimigos;
+
+  fase = CriarFase(fase.contagem_inimigos, pntr_inimigos, 10, 10);
+
   int array[6][2] = {{1, 2}, {3}, {4}, {5}, {}, {}};
   breadFirstTravesal(array, 0);
+  cout << "\n";
+
+  mapaBreadFirstTravesal(fase.mapa);
+
   //*jogar_fase(jogador, fase);
 }
